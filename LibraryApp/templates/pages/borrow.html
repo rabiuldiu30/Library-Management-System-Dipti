@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Borrow Book | LibraryPro{% endblock %}
+
+{% block content %}
+    <!-- HEADER -->
+    <section class="page-header">
+        <h1>Borrow Your Book</h1>
+        <p>Choose your preferred borrowing method</p>
+    </section>
+
+    <section class="borrow-container">
+        <!-- BOOK INFO -->
+        <div class="borrow-book">
+            {% if book.cover_image %}
+                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" />
+            {% else %}
+                <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1200" alt="{{ book.title }}" />
+            {% endif %}
+            
+            <div>
+                <h2>{{ book.title }}</h2>
+                <p>Author: {{ book.author }}</p>
+                <p>Borrow Rate: <strong>৳{{ book.borrow_price_per_day }}/day</strong></p>
+            </div>
+        </div>
+
+        <!-- BORROW FORM -->
+        <div class="borrow-options">
+            <h2>Select Borrow Method</h2>
+
+            <form method="POST" action="{% url 'library:borrow' book.id %}">
+                {% csrf_token %}
+
+                <div class="option-card">
+                    <input type="radio" name="delivery_method" value="pickup" id="pickup" required />
+                    <label for="pickup">
+                        <div>
+                            <i class="fa-solid fa-building"></i>
+                            <h3>Library Pickup</h3>
+                            <p>Collect book directly from library</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="option-card">
+                    <input type="radio" name="delivery_method" value="home_delivery" id="home_delivery" required />
+                    <label for="home_delivery">
+                        <div>
+                            <i class="fa-solid fa-truck"></i>
+                            <h3>Home Delivery</h3>
+                            <p>Receive book within 48-72 hours</p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- LIBRARY PICKUP SECTION -->
+                <div class="borrow-box" id="pickup-section" style="display:none;">
+                    <h2>Library Pickup System</h2>
+                    <p>Your pickup serial number will be generated after confirmation.</p>
+                    
+                    <div class="serial-box">
+                        <h1 id="serial-number">Pending Confirmation</h1>
+                        <p>Show this serial number at library counter</p>
+                    </div>
+
+                    <div class="pickup-time">
+                        <i class="fa-solid fa-calendar"></i>
+                        Pickup Date: <span id="pickup-date">To be determined</span>
+                        <br /><br />
+                        <i class="fa-solid fa-clock"></i>
+                        Time: 10:00 AM - 5:00 PM
+                    </div>
+                </div>
+
+                <!-- HOME DELIVERY SECTION -->
+                <div class="borrow-box" id="delivery-section" style="display:none;">
+                    <h2>Home Delivery</h2>
+
+                    <textarea 
+                        name="delivery_address" 
+                        placeholder="Full Delivery Address"
+                        style="margin: 15px 0;"
+                    ></textarea>
+
+                    <div class="delivery-time">
+                        <i class="fa-solid fa-truck-fast"></i>
+                        Expected Delivery: <strong>48-72 Hours</strong>
+                    </div>
+
+                    <div class="otp-box">
+                        <h3>OTP Verification</h3>
+                        <p>An OTP will be provided by delivery person</p>
+                    </div>
+                </div>
+
+                <!-- BORROW DURATION & COST -->
+                <div class="cost-box">
+                    <h2>Borrow Summary</h2>
+
+                    <div>
+                        <span>Borrow Duration</span>
+                        <div>
+                            <select name="duration_days" required>
+                                <option value="">Select Duration</option>
+                                <option value="7">7 Days</option>
+                                <option value="14">14 Days</option>
+                                <option value="30">30 Days</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span>Book Charge</span>
+                        <strong id="book-charge">৳0</strong>
+                    </div>
+
+                    <div>
+                        <span>Delivery Charge</span>
+                        <strong id="delivery-fee">৳{{ delivery_charge|default:"0" }}</strong>
+                    </div>
+
+                    <hr />
+
+                    <div class="total">
+                        <span>Total</span>
+                        <strong id="total-amount">৳{{ total_cost|default:"0" }}</strong>
+                    </div>
+
+                    <button type="submit" class="btn">Confirm Borrow</button>
+                    <a href="{% url 'library:books_list' %}" style="text-align: center; display: block; margin-top: 10px; color: var(--primary);">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // Show/hide delivery options
+        const pickupRadio = document.getElementById('pickup');
+        const homeDeliveryRadio = document.getElementById('home_delivery');
+        const pickupSection = document.getElementById('pickup-section');
+        const deliverySection = document.getElementById('delivery-section');
+        const deliveryFeeElement = document.getElementById('delivery-fee');
+        const bookPricePerDay = {{ book.borrow_price_per_day }};
+        const baseDeliveryCharge = {{ delivery_charge|default:"0" }};
+
+        pickupRadio.addEventListener('change', () => {
+            pickupSection.style.display = 'block';
+            deliverySection.style.display = 'none';
+            deliveryFeeElement.textContent = '৳0';
+            updateTotal();
+        });
+
+        homeDeliveryRadio.addEventListener('change', () => {
+            pickupSection.style.display = 'none';
+            deliverySection.style.display = 'block';
+            deliveryFeeElement.textContent = '৳' + baseDeliveryCharge;
+            updateTotal();
+        });
+
+        // Update total based on duration
+        document.querySelector('[name="duration_days"]').addEventListener('change', updateTotal);
+
+        function updateTotal() {
+            const durationSelect = document.querySelector('[name="duration_days"]');
+            const duration = parseInt(durationSelect.value) || 0;
+            const bookCharge = duration * bookPricePerDay;
+            const deliveryFee = document.querySelector('input[name="delivery_method"]:checked')?.value === 'home_delivery' ? baseDeliveryCharge : 0;
+            const total = bookCharge + deliveryFee;
+
+            document.getElementById('book-charge').textContent = '৳' + bookCharge;
+            document.getElementById('delivery-fee').textContent = '৳' + deliveryFee;
+            document.getElementById('total-amount').textContent = '৳' + total;
+        }
+    </script>
+{% endblock %}
+        <div>
+          <h3>LibraryPro</h3>
+
+          <p>Smart Digital Library Management System</p>
+        </div>
+      </div>
+
+      <div class="copyright">© 2026 LibraryPro</div>
+    </footer>
+  </body>
+</html>

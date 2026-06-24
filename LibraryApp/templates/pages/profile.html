@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile | LibraryPro{% endblock %}
+
+{% block content %}
+    <!-- PROFILE HEADER -->
+    <section class="profile-header">
+        <div class="profile-card">
+            {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" class="img" alt="{{ user.get_full_name }}" />
+            {% else %}
+                <img src="{% static 'images/profile.jpeg' %}" class="img" alt="Profile" />
+            {% endif %}
+
+            <h2>{{ user.get_full_name|default:user.username }}</h2>
+            <p>{{ user.member_type|default:"Member" }}</p>
+            
+            <a href="{% url 'library:edit_profile' %}" class="btn">Edit Profile</a>
+        </div>
+    </section>
+
+    <!-- PROFILE DETAILS -->
+    <section class="profile-section">
+        <div class="profile-info">
+            <h2>Personal Information</h2>
+
+            <div class="info-row">
+                <span>Full Name</span>
+                <strong>{{ user.get_full_name|default:user.username }}</strong>
+            </div>
+
+            <div class="info-row">
+                <span>Email</span>
+                <strong>{{ user.email }}</strong>
+            </div>
+
+            <div class="info-row">
+                <span>Phone</span>
+                <strong>{{ user.phone|default:"Not provided" }}</strong>
+            </div>
+
+            <div class="info-row">
+                <span>Student ID</span>
+                <strong>{{ user.student_id|default:"N/A" }}</strong>
+            </div>
+
+            <div class="info-row">
+                <span>Member Since</span>
+                <strong>{{ user.date_joined_library|date:"d M, Y" }}</strong>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="profile-stats">
+            <div>
+                <i class="fa-solid fa-book"></i>
+                <h3>{{ total_borrowed }}</h3>
+                <p>Total Borrowed</p>
+            </div>
+
+            <div>
+                <i class="fa-solid fa-clock"></i>
+                <h3>{{ active_borrows }}</h3>
+                <p>Active Borrow</p>
+            </div>
+
+            <div>
+                <i class="fa-solid fa-money-bill"></i>
+                <h3>৳{{ total_fine }}</h3>
+                <p>Fine Due</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CURRENTLY BORROWED BOOKS -->
+    {% if borrow_transactions %}
+        <section class="section">
+            <h2 class="section-title">Currently Borrowed Books</h2>
+
+            <div class="borrow-history">
+                {% for transaction in borrow_transactions %}
+                    <div class="history-card">
+                        {% if transaction.book.cover_image %}
+                            <img src="{{ transaction.book.cover_image.url }}" alt="{{ transaction.book.title }}" />
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1200" alt="{{ transaction.book.title }}" />
+                        {% endif %}
+
+                        <div>
+                            <h3>{{ transaction.book.title }}</h3>
+                            <p>Borrow Date: {{ transaction.borrow_date|date:"d M Y" }}</p>
+                            <p>Return Date: {{ transaction.due_date|date:"d M Y" }}</p>
+                            
+                            {% if transaction.is_active %}
+                                <span class="status">Active</span>
+                            {% elif transaction.is_returned %}
+                                <span class="status" style="background: #10b981;">Returned</span>
+                            {% elif transaction.is_overdue %}
+                                <span class="late">Overdue</span>
+                            {% else %}
+                                <span class="late">Due Soon</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <!-- WISHLIST / FAVORITE BOOKS -->
+    {% if favorite_books %}
+        <section class="section">
+            <h2 class="section-title">Your Favorite Books</h2>
+
+            <div class="book-grid">
+                {% for book in favorite_books %}
+                    <div class="book-card">
+                        {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" />
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=1200" alt="{{ book.title }}" />
+                        {% endif %}
+
+                        <div class="book-content">
+                            <h3>{{ book.title }}</h3>
+                            <a href="{% url 'library:book_detail' book.id %}" class="btn">View</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <!-- ACTION BUTTONS -->
+    <section class="section" style="text-align: center; margin: 40px 0;">
+        <a href="{% url 'library:books_list' %}" class="btn">Browse Books</a>
+        <a href="{% url 'library:wishlist' %}" class="btn">View Wishlist</a>
+        <a href="{% url 'library:logout' %}" class="btn" style="background: #ef4444;">Logout</a>
+    </section>
+{% endblock %}
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <h3>LibraryPro</h3>
+
+          <p>Premium Digital Library Platform</p>
+        </div>
+
+        <div>
+          <h3>Links</h3>
+
+          <a href="books.html"> Books </a>
+
+          <a href="contact.html"> Contact </a>
+        </div>
+      </div>
+
+      <div class="copyright">© 2026 LibraryPro</div>
+    </footer>
+  </body>
+</html>

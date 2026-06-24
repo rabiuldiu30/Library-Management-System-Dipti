@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Books | LibraryPro{% endblock %}
+
+{% block content %}
+    <!-- HEADER -->
+    <section class="page-header">
+        <h1>Explore Books</h1>
+        <p>Find your favorite books from our collection</p>
+    </section>
+
+    <!-- FILTER & SORT -->
+    <section class="filter-area">
+        <form method="GET" action="{% url 'library:books_list' %}">
+            <div>
+                <h3>Categories</h3>
+                {% for category in categories %}
+                    <button 
+                        type="submit" 
+                        name="category" 
+                        value="{{ category.id }}"
+                        {% if request.GET.category|stringformat:"s" == category.id|stringformat:"s" %}style="background: var(--primary);"{% endif %}
+                    >
+                        {{ category.name }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <div>
+                <h3>Sort By</h3>
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>Popular</option>
+                    <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Highest Rating</option>
+                    <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                </select>
+            </div>
+        </form>
+    </section>
+
+    <!-- BOOK GRID -->
+    <section class="books-section">
+        {% if books %}
+            {% for book in books %}
+                <div class="premium-book-card">
+                    {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" />
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1200" alt="{{ book.title }}" />
+                    {% endif %}
+
+                    <div class="premium-book-content">
+                        <span>{{ book.category.name }}</span>
+                        <h2>{{ book.title }}</h2>
+                        <p>Author: {{ book.author }}</p>
+
+                        <div class="book-rating">
+                            ⭐ {{ book.get_world_rating }} (World)
+                            <br />
+                            🇧🇩 {{ book.get_bangladesh_rating }} (National)
+                        </div>
+
+                        <div class="price">
+                            {% if book.book_type == 'both' or book.book_type == 'borrow' %}
+                                Borrow: <strong>৳{{ book.borrow_price_per_day }}/day</strong>
+                            {% endif %}
+                            {% if book.book_type == 'both' or book.book_type == 'buy' %}
+                                {% if book.book_type == 'both' %}<br />{% endif %}
+                                Buy: <strong>৳{{ book.purchase_price }}</strong>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-buttons">
+                            <a href="{% url 'library:book_detail' book.id %}" class="btn">Details</a>
+
+                            {% if book.book_type == 'borrow' or book.book_type == 'both' %}
+                                <a href="{% url 'library:borrow' book.id %}" class="btn borrow">Borrow</a>
+                            {% endif %}
+
+                            {% if book.book_type == 'buy' or book.book_type == 'both' %}
+                                <a href="{% url 'library:add_to_cart' book.id %}?type=buy" class="btn borrow">Buy</a>
+                            {% endif %}
+
+                            {% if user.is_authenticated %}
+                                <form method="POST" action="{% url 'library:add_to_wishlist' book.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="wish-btn" title="Add to Wishlist">♡</button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'library:login' %}?next={{ request.path }}" class="wish-btn" title="Login to add to wishlist">♡</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
+                <h2>No books found</h2>
+                <p>Try adjusting your search or filters</p>
+                <a href="{% url 'library:books_list' %}" class="btn">Clear Filters</a>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

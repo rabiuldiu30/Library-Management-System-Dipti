@@ -1,0 +1,154 @@
+{% extends 'base.html' %} {% load static %} {% block title %}{{ book.title }} |
+LibraryPro{% endblock %} {% block content %}
+<!-- BOOK DETAILS -->
+<section class="book-details">
+  <div class="book-image">
+    {% if book.cover_image %}
+    <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" />
+    {% else %}
+    <img
+      src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1200"
+      alt="{{ book.title }}"
+    />
+    {% endif %}
+  </div>
+
+  <div class="book-info">
+    <span class="category">{{ book.category.name }}</span>
+
+    <h1>{{ book.title }}</h1>
+
+    <p class="author">Written by: <strong>{{ book.author }}</strong></p>
+
+    <div class="ratings">
+      <div>
+        🌎 World Rating
+        <br />
+        <strong>{{ book.get_world_rating }} / 5</strong>
+      </div>
+
+      <div>
+        🇧🇩 Bangladesh Rating
+        <br />
+        <strong>{{ book.get_bangladesh_rating }} / 5</strong>
+      </div>
+    </div>
+
+    <div class="book-meta">
+      <p>
+        <i class="fa-solid fa-calendar"></i>
+        Released: {{ book.publication_year }}
+      </p>
+
+      <p>
+        <i class="fa-solid fa-language"></i>
+        Language: {{ book.language|default:"English" }}
+      </p>
+
+      <p>
+        <i class="fa-solid fa-file"></i>
+        Pages: {{ book.pages_count|default:"N/A" }}
+      </p>
+
+      <p>
+        <i class="fa-solid fa-book"></i>
+        Type: {% if book.book_type == 'borrow' %} Borrowable {% elif
+        book.book_type == 'buy' %} Purchasable {% else %} Borrow & Buy {% endif
+        %}
+      </p>
+    </div>
+
+    <h2>Book Summary</h2>
+
+    <p class="summary">
+      {{ book.description|default:"No description available." }}
+    </p>
+
+    <!-- Pricing Info -->
+    <div
+      style="
+        margin: 20px 0;
+        padding: 15px;
+        background: #f0f4f8;
+        border-radius: 8px;
+      "
+    >
+      {% if book.book_type == 'borrow' or book.book_type == 'both' %}
+      <p><strong>Borrow Price:</strong> ৳{{ book.borrow_price_per_day }}/day</p>
+      {% endif %} {% if book.book_type == 'buy' or book.book_type == 'both' %}
+      <p><strong>Purchase Price:</strong> ৳{{ book.purchase_price }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Availability -->
+    {% if book.book_type == 'borrow' or book.book_type == 'both' %}
+    <p style="color: #10b981; font-weight: bold">
+      <i class="fa-solid fa-check-circle"></i>
+      {% if book.available_copies > 0 %} {{ book.available_copies }} Copies
+      Available for Borrow {% else %} Currently Unavailable {% endif %}
+    </p>
+    {% endif %}
+
+    <!-- Reviews Section -->
+    {% if ratings %}
+    <div style="margin: 30px 0">
+      <h3>User Reviews</h3>
+      {% for rating in ratings|slice:":5" %}
+      <div style="padding: 10px; border-bottom: 1px solid #e5e7eb">
+        <strong
+          >{{ rating.user.get_full_name|default:rating.user.username }}</strong
+        >
+        - ⭐ {{ rating.rating }} / 5
+        <p style="margin-top: 5px; color: #666">{{ rating.review }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="book-actions">
+      {% if book.book_type == 'borrow' or book.book_type == 'both' %} {% if
+      user.is_authenticated %}
+      <a href="{% url 'library:borrow' book.id %}" class="btn">Borrow Now</a>
+      {% else %}
+      <a
+        href="{% url 'library:login' %}?next={% url 'library:borrow' book.id %}"
+        class="btn"
+        >Login to Borrow</a
+      >
+      {% endif %} {% endif %} {% if book.book_type == 'buy' or book.book_type ==
+      'both' %} {% if user.is_authenticated %}
+      <a href="{% url 'library:add_to_cart' book.id %}?type=buy" class="buy-btn"
+        >Add to Cart</a
+      >
+      {% else %}
+      <a
+        href="{% url 'library:login' %}?next={{ request.path }}"
+        class="buy-btn"
+        >Login to Buy</a
+      >
+      {% endif %} {% endif %} {% if user.is_authenticated %}
+      <form
+        method="POST"
+        action="{% url 'library:add_to_wishlist' book.id %}"
+        style="display: inline"
+      >
+        {% csrf_token %}
+        <button type="submit" class="wish-btn wish-btn1">
+          <i class="fa-regular fa-heart"></i>
+          Add to Wishlist
+        </button>
+      </form>
+      {% else %}
+      <a
+        href="{% url 'library:login' %}?next={{ request.path }}"
+        class="wish-btn wish-btn1"
+      >
+        <i class="fa-regular fa-heart"></i>
+        Login to Wishlist
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

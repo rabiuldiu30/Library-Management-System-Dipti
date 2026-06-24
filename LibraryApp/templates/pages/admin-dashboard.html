@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard | LibraryPro{% endblock %}
+
+{% block content %}
+    <div class="admin-layout">
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <i class="fa-solid fa-book-open"></i>
+                LibraryPro Admin
+            </div>
+
+            <ul>
+                <li class="active">
+                    <a href="#dashboard">
+                        <i class="fa-solid fa-chart-line"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'admin:LibraryApp_book_changelist' %}">
+                        <i class="fa-solid fa-book"></i>
+                        Books
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'admin:LibraryApp_customuser_changelist' %}">
+                        <i class="fa-solid fa-users"></i>
+                        Users
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'admin:LibraryApp_borrowtransaction_changelist' %}">
+                        <i class="fa-solid fa-handshake"></i>
+                        Borrow Requests
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'admin:LibraryApp_order_changelist' %}">
+                        <i class="fa-solid fa-truck"></i>
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'admin:index' %}">
+                        <i class="fa-solid fa-gear"></i>
+                        Admin Panel
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Dashboard</h1>
+                <div>
+                    <i class="fa-solid fa-bell"></i>
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" />
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200" alt="Profile" />
+                    {% endif %}
+                </div>
+            </header>
+
+            <!-- STAT CARDS -->
+            <section class="admin-stats">
+                <div class="admin-stat-card">
+                    <i class="fa-solid fa-book"></i>
+                    <h2>{{ total_books }}+</h2>
+                    <p>Total Books</p>
+                </div>
+
+                <div class="admin-stat-card">
+                    <i class="fa-solid fa-users"></i>
+                    <h2>{{ total_members }}+</h2>
+                    <p>Registered Users</p>
+                </div>
+
+                <div class="admin-stat-card">
+                    <i class="fa-solid fa-book-reader"></i>
+                    <h2>{{ active_borrows }}</h2>
+                    <p>Active Borrows</p>
+                </div>
+
+                <div class="admin-stat-card">
+                    <i class="fa-solid fa-money-bill"></i>
+                    <h2>{{ monthly_revenue }}</h2>
+                    <p>Monthly Revenue</p>
+                </div>
+            </section>
+
+            <!-- RECENT ORDERS TABLE -->
+            <section class="admin-table-box">
+                <div class="table-header">
+                    <h2>Recent Orders</h2>
+                    <a href="{% url 'admin:LibraryApp_order_changelist' %}" class="btn">View All Orders</a>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                    
+                    {% for order in recent_orders %}
+                        <tr>
+                            <td>{{ order.order_number }}</td>
+                            <td>{{ order.user.get_full_name|default:order.user.username }}</td>
+                            <td>৳{{ order.total_amount }}</td>
+                            <td>
+                                {% if order.status == 'completed' %}
+                                    <span class="approved">Completed</span>
+                                {% elif order.status == 'pending' %}
+                                    <span class="pending">Pending</span>
+                                {% elif order.status == 'cancelled' %}
+                                    <span style="background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px;">Cancelled</span>
+                                {% else %}
+                                    <span class="pending">{{ order.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.created_at|date:"d M Y" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #999;">
+                                No recent orders
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </section>
+
+            <!-- BORROW REQUESTS TABLE -->
+            <section class="admin-table-box" style="margin-top: 30px;">
+                <div class="table-header">
+                    <h2>Borrow Requests</h2>
+                    <a href="{% url 'admin:LibraryApp_borrowtransaction_changelist' %}" class="btn">Manage All</a>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>User</th>
+                        <th>Book</th>
+                        <th>Delivery Method</th>
+                        <th>Status</th>
+                        <th>Due Date</th>
+                    </tr>
+                    
+                    {% for borrow in active_borrow_requests %}
+                        <tr>
+                            <td>{{ borrow.user.get_full_name|default:borrow.user.username }}</td>
+                            <td>{{ borrow.book.title }}</td>
+                            <td>{{ borrow.delivery_method|title }}</td>
+                            <td>
+                                {% if borrow.is_active %}
+                                    <span class="approved">Active</span>
+                                {% elif borrow.is_overdue %}
+                                    <span style="background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px;">Overdue</span>
+                                {% else %}
+                                    <span class="pending">{{ borrow.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ borrow.due_date|date:"d M Y" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #999;">
+                                No active borrow requests
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </section>
+
+            <!-- ACTION BUTTONS -->
+            <section style="margin-top: 30px; text-align: center;">
+                <a href="{% url 'admin:index' %}" class="btn" style="margin-right: 10px;">Go to Admin Panel</a>
+                <a href="{% url 'library:home' %}" class="btn">Back to Website</a>
+            </section>
+        </main>
+    </div>
+
+    <style>
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: var(--primary);
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .admin-logo {
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .admin-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .admin-sidebar ul li {
+            padding: 0;
+            margin: 0;
+        }
+
+        .admin-sidebar ul li a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .admin-sidebar ul li a:hover,
+        .admin-sidebar ul li.active a {
+            background: rgba(255,255,255,0.1);
+            border-left-color: white;
+        }
+
+        .admin-sidebar ul li a i {
+            margin-right: 10px;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .admin-header div {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .admin-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .admin-stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .admin-stat-card i {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .admin-stat-card h2 {
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .admin-table-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #f8fafc;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .approved {
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .pending {
+            background: #f59e0b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex: 0;
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-layout {
+                flex-direction: column;
+            }
+
+            .admin-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+            <tr>
+              <td>Sarah Lee</td>
+
+              <td>Python Basics</td>
+
+              <td>Library Pickup</td>
+
+              <td>
+                <span class="pending"> Pending </span>
+              </td>
+            </tr>
+          </table>
+        </section>
+
+        <!-- DELIVERY -->
+
+        <section class="delivery-box">
+          <h2>Delivery Tracking</h2>
+
+          <div class="delivery-item">
+            <i class="fa-solid fa-box"></i>
+
+            <div>
+              <h3>Order #LP202601</h3>
+
+              <p>Out for delivery</p>
+            </div>
+
+            <span> 48 hrs </span>
+          </div>
+
+          <div class="delivery-item">
+            <i class="fa-solid fa-box"></i>
+
+            <div>
+              <h3>Order #LP202602</h3>
+
+              <p>Delivered</p>
+            </div>
+
+            <span> Completed </span>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

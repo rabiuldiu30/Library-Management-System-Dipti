@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us | LibraryPro{% endblock %}
+
+{% block content %}
+    <!-- HERO -->
+    <section class="about-hero">
+        <div>
+            <h1>About LibraryPro</h1>
+            <p>
+                A modern digital library management system designed for students,
+                researchers and book lovers.
+            </p>
+        </div>
+    </section>
+
+    <!-- STORY -->
+    <section class="about-story">
+        <div class="about-image">
+            <img
+                src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1200"
+                alt="LibraryPro"
+            />
+        </div>
+
+        <div class="about-text">
+            <h2>Our Story</h2>
+            <p>
+                LibraryPro started with a simple mission: making knowledge accessible
+                everywhere. We combine modern technology with traditional library
+                services to create a smart reading experience.
+            </p>
+            <p>
+                Users can discover books, borrow, purchase, track returns and manage
+                their reading journey from one platform.
+            </p>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-section">
+        <div class="about-stat">
+            <h2>{{ total_books }}+</h2>
+            <p>Books Available</p>
+        </div>
+
+        <div class="about-stat">
+            <h2>{{ total_members }}+</h2>
+            <p>Active Members</p>
+        </div>
+
+        <div class="about-stat">
+            <h2>120+</h2>
+            <p>Partner Libraries</p>
+        </div>
+
+        <div class="about-stat">
+            <h2>24/7</h2>
+            <p>Digital Access</p>
+        </div>
+    </section>
+
+    <!-- MISSION -->
+    <section class="section">
+        <h2 class="section-title">Our Mission & Vision</h2>
+
+        <div class="mission-grid">
+            <div class="mission-card">
+                <i class="fa-solid fa-bullseye"></i>
+                <h3>Mission</h3>
+                <p>
+                    Provide affordable and smart access to education resources for
+                    everyone.
+                </p>
+            </div>
+
+            <div class="mission-card">
+                <i class="fa-solid fa-eye"></i>
+                <h3>Vision</h3>
+                <p>Become the world's most trusted digital learning platform.</p>
+            </div>
+
+            <div class="mission-card">
+                <i class="fa-solid fa-handshake"></i>
+                <h3>Values</h3>
+                <p>Accessibility, Innovation, Community and Excellence in service.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="section">
+        <h2 class="section-title">Our Services</h2>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <i class="fa-solid fa-book-open"></i>
+                <h3>Book Borrowing</h3>
+                <p>Borrow thousands of books for flexible durations</p>
+            </div>
+
+            <div class="service-card">
+                <i class="fa-solid fa-shopping-cart"></i>
+                <h3>Book Purchase</h3>
+                <p>Buy books directly with secure payment options</p>
+            </div>
+
+            <div class="service-card">
+                <i class="fa-solid fa-truck"></i>
+                <h3>Home Delivery</h3>
+                <p>Fast and reliable delivery to your doorstep</p>
+            </div>
+
+            <div class="service-card">
+                <i class="fa-solid fa-star"></i>
+                <h3>Ratings & Reviews</h3>
+                <p>Share and discover what others think about books</p>
+            </div>
+
+            <div class="service-card">
+                <i class="fa-solid fa-heart"></i>
+                <h3>Wishlist</h3>
+                <p>Save your favorite books for later</p>
+            </div>
+
+            <div class="service-card">
+                <i class="fa-solid fa-headset"></i>
+                <h3>24/7 Support</h3>
+                <p>Round-the-clock customer service</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="section" style="text-align: center; background: var(--primary); color: white; padding: 40px; border-radius: 8px; margin: 40px 0;">
+        <h2>Start Your Reading Journey Today</h2>
+        <p style="color: #e0e7ff; margin: 15px 0;">Join thousands of readers exploring our vast collection of books</p>
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'library:books_list' %}" class="btn" style="background: white; color: var(--primary);">Browse Books</a>
+        {% else %}
+            <a href="{% url 'library:register' %}" class="btn" style="background: white; color: var(--primary);">Join Now</a>
+        {% endif %}
+    </section>
+{% endblock %}
+        </div>
+
+        <div class="mission-card">
+          <i class="fa-solid fa-lightbulb"></i>
+
+          <h3>Innovation</h3>
+
+          <p>Using technology to improve modern library experiences.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY US -->
+
+    <section class="section">
+      <h2 class="section-title">Why Choose LibraryPro?</h2>
+
+      <div class="choose-grid">
+        <div>
+          <i class="fa-solid fa-truck"></i>
+
+          <h3>Fast Delivery</h3>
+
+          <p>Receive books within 48-72 hours.</p>
+        </div>
+
+        <div>
+          <i class="fa-solid fa-shield-halved"></i>
+
+          <h3>Secure System</h3>
+
+          <p>Safe account and payment system.</p>
+        </div>
+
+        <div>
+          <i class="fa-solid fa-clock"></i>
+
+          <h3>Easy Borrowing</h3>
+
+          <p>Track borrowing time and returns.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEAM -->
+
+    <section class="section">
+      <h2 class="section-title">Our Team</h2>
+
+      <div class="team-grid">
+        <div class="team-card">
+          <img
+            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43c?q=80&w=400"
+          />
+
+          <h3>David Miller</h3>
+
+          <p>Founder & CEO</p>
+        </div>
+
+        <div class="team-card">
+          <img
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400"
+          />
+
+          <h3>Sarah Wilson</h3>
+
+          <p>Library Manager</p>
+        </div>
+
+        <div class="team-card">
+          <img
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400"
+          />
+
+          <h3>Michael Lee</h3>
+
+          <p>Technology Lead</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <h3>LibraryPro</h3>
+
+          <p>Smart Digital Library Platform</p>
+        </div>
+
+        <div>
+          <h3>Quick Links</h3>
+
+          <a href="books.html"> Books </a>
+
+          <a href="contact.html"> Contact </a>
+        </div>
+      </div>
+
+      <div class="copyright">© 2026 LibraryPro</div>
+    </footer>
+  </body>
+</html>

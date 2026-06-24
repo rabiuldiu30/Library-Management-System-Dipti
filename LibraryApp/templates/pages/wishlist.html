@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Wishlist | LibraryPro{% endblock %}
+
+{% block content %}
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+        <h1>My Wishlist</h1>
+        <p>Save your favorite books for later.</p>
+    </section>
+
+    <!-- WISHLIST SECTION -->
+    <section class="wishlist-section">
+        {% if books %}
+            {% for book in books %}
+                <div class="wishlist-card">
+                    {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1200" alt="{{ book.title }}">
+                    {% endif %}
+
+                    <div class="wishlist-content">
+                        <span class="category">{{ book.category.name }}</span>
+                        <h3>{{ book.title }}</h3>
+                        <p>Author: {{ book.author }}</p>
+                        <div class="rating">
+                            ⭐ {{ book.get_world_rating }}
+                        </div>
+                    </div>
+
+                    <div class="wishlist-actions">
+                        <a href="{% url 'library:book_detail' book.id %}" class="btn">View</a>
+
+                        {% if book.book_type == 'borrow' or book.book_type == 'both' %}
+                            <a href="{% url 'library:borrow' book.id %}" class="btn">Borrow</a>
+                        {% endif %}
+
+                        {% if book.book_type == 'buy' or book.book_type == 'both' %}
+                            <a href="{% url 'library:add_to_cart' book.id %}?type=buy" class="btn">Add To Cart</a>
+                        {% endif %}
+
+                        <form method="POST" action="{% url 'library:remove_from_wishlist' book.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="remove-btn">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
+                <i class="fa-regular fa-heart" style="font-size: 48px; color: #ccc;"></i>
+                <h2 style="margin-top: 20px;">Your wishlist is empty</h2>
+                <p>Add books to your wishlist to save them for later</p>
+                <a href="{% url 'library:books_list' %}" class="btn">Browse Books</a>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}
+
+        <div class="wishlist-actions">
+
+            <a href="book-details.html"
+            class="btn">
+
+                View
+
+            </a>
+
+            <button class="btn">
+
+                Add To Cart
+
+            </button>
+
+            <button class="remove-btn">
+
+                <i class="fa-solid fa-trash"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- EMPTY STATE -->
+
+<section class="empty-wishlist">
+
+    <i class="fa-regular fa-heart"></i>
+
+    <h2>
+        No Books Saved Yet
+    </h2>
+
+    <p>
+        Add books to your wishlist and access them anytime.
+    </p>
+
+    <a href="books.html"
+    class="btn">
+
+        Explore Books
+
+    </a>
+
+</section>
+
+<!-- FOOTER -->
+
+<footer>
+
+    <div class="footer-grid">
+
+        <div>
+
+            <h3>
+                LibraryPro
+            </h3>
+
+            <p>
+                Premium Digital Library Management System.
+            </p>
+
+        </div>
+
+        <div>
+
+            <h3>
+                Quick Links
+            </h3>
+
+            <a href="books.html">Books</a>
+
+            <a href="about.html">About</a>
+
+            <a href="contact.html">Contact</a>
+
+        </div>
+
+    </div>
+
+    <div class="copyright">
+
+        © 2026 LibraryPro
+
+    </div>
+
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout | LibraryPro{% endblock %}
+
+{% block content %}
+    <!-- HEADER -->
+    <section class="page-header">
+        <h1>Checkout</h1>
+        <p>Complete your order securely</p>
+    </section>
+
+    <!-- CHECKOUT AREA -->
+    <section class="checkout-section">
+        <!-- LEFT FORM -->
+        <div class="checkout-form">
+            <form method="POST" action="{% url 'library:checkout' %}">
+                {% csrf_token %}
+                
+                <h2>Delivery Information</h2>
+
+                <div class="input-row">
+                    <input 
+                        type="text" 
+                        placeholder="Full Name" 
+                        name="full_name"
+                        value="{{ form.full_name.value|default:'' }}"
+                        required
+                    />
+                    <input 
+                        type="email" 
+                        placeholder="Email Address" 
+                        name="email"
+                        value="{{ form.email.value|default:'' }}"
+                        required
+                    />
+                </div>
+
+                <div class="input-row">
+                    <input 
+                        type="text" 
+                        placeholder="Phone Number" 
+                        name="phone"
+                        value="{{ form.phone.value|default:'' }}"
+                        required
+                    />
+                    <input 
+                        type="text" 
+                        placeholder="City" 
+                        name="city"
+                        value="{{ form.city.value|default:'' }}"
+                        required
+                    />
+                </div>
+
+                <textarea 
+                    placeholder="Full Delivery Address" 
+                    name="delivery_address"
+                    required
+                >{{ form.delivery_address.value|default:'' }}</textarea>
+
+                <h2>Delivery Method</h2>
+                <div class="delivery-options">
+                    <label>
+                        <input 
+                            type="radio" 
+                            name="delivery_method" 
+                            value="pickup"
+                            {% if form.delivery_method.value == 'pickup' %}checked{% endif %}
+                        />
+                        Library Pickup
+                    </label>
+                    <label>
+                        <input 
+                            type="radio" 
+                            name="delivery_method" 
+                            value="home_delivery"
+                            {% if form.delivery_method.value == 'home_delivery' %}checked{% endif %}
+                        />
+                        Home Delivery (48-72 Hours)
+                    </label>
+                </div>
+
+                <h2>Payment Method</h2>
+                <div class="payment-options">
+                    <label class="payment-card">
+                        <input type="radio" name="payment_method" value="bkash" />
+                        <div>
+                            <i class="fa-solid fa-mobile-screen"></i>
+                            <h3>bKash</h3>
+                            <p>Mobile Payment</p>
+                        </div>
+                    </label>
+
+                    <label class="payment-card">
+                        <input type="radio" name="payment_method" value="nagad" />
+                        <div>
+                            <i class="fa-solid fa-wallet"></i>
+                            <h3>Nagad</h3>
+                            <p>Mobile Payment</p>
+                        </div>
+                    </label>
+
+                    <label class="payment-card">
+                        <input type="radio" name="payment_method" value="card" />
+                        <div>
+                            <i class="fa-solid fa-credit-card"></i>
+                            <h3>Card</h3>
+                            <p>Visa / MasterCard</p>
+                        </div>
+                    </label>
+
+                    <label class="payment-card">
+                        <input type="radio" name="payment_method" value="cod" />
+                        <div>
+                            <i class="fa-solid fa-money-bill"></i>
+                            <h3>Cash On Delivery</h3>
+                            <p>Pay After Delivery</p>
+                        </div>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">
+                    Place Order
+                </button>
+            </form>
+        </div>
+
+        <!-- RIGHT: ORDER SUMMARY -->
+        <div class="checkout-summary">
+            <h2>Order Summary</h2>
+
+            {% if cart_items %}
+                {% for cart_item in cart_items %}
+                    <div class="checkout-book">
+                        {% if cart_item.book.cover_image %}
+                            <img src="{{ cart_item.book.cover_image.url }}" alt="{{ cart_item.book.title }}" />
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1200" alt="{{ cart_item.book.title }}" />
+                        {% endif %}
+                        <div>
+                            <h3>{{ cart_item.book.title }}</h3>
+                            <p>{% if cart_item.item_type == 'borrow' %}Borrow - {{ cart_item.duration_days }} Days{% else %}Buy - Qty: {{ cart_item.quantity }}{% endif %}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="checkout-row">
+                <span>Books Total</span>
+                <strong>৳{{ items_total|default:"0" }}</strong>
+            </div>
+
+            <div class="checkout-row">
+                <span>Delivery Fee</span>
+                <strong>৳{{ delivery_charge|default:"30" }}</strong>
+            </div>
+
+            <div class="checkout-row">
+                <span>Service Charge</span>
+                <strong>৳{{ service_fee|default:"10" }}</strong>
+            </div>
+
+            <hr />
+
+            <div class="checkout-total">
+                <span>Total</span>
+                <strong>৳{{ total_amount|default:"0" }}</strong>
+            </div>
+
+            <a href="{% url 'library:cart' %}" style="text-align: center; display: block; margin-top: 10px; color: var(--primary);">
+                Back to Cart
+            </a>
+        </div>
+    </section>
+{% endblock %}
+        </div>
+      </div>
+
+      <div class="copyright">© 2026 LibraryPro</div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,121 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}LibraryPro | Digital Library Management System{% endblock %}
+    </title>
+
+    {% load static %}
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    {% block extra_css %}
+    {% endblock %}
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-book-open"></i>
+        LibraryPro
+      </div>
+
+      <div class="search-box">
+        <form
+          method="GET"
+          action="{% url 'library:books_list' %}"
+          style="display: flex; gap: 10px"
+        >
+          <input
+            type="text"
+            name="search"
+            placeholder="Search books, authors, ISBN..."
+            value="{{ search_query }}"
+          />
+          <button type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="{% url 'library:home' %}">Home</a></li>
+        <li><a href="{% url 'library:books_list' %}">Books</a></li>
+        <li><a href="{% url 'library:about' %}">About</a></li>
+        <li><a href="{% url 'library:contact' %}">Contact</a></li>
+
+        {% if user.is_authenticated %}
+        <li>
+          <a href="{% url 'library:wishlist' %}">
+            <i class="fa-regular fa-heart"></i>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'library:cart' %}">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </a>
+        </li>
+        <li><a href="{% url 'library:profile' %}">Profile</a></li>
+        <li>
+          <a href="{% url 'library:logout' %}" class="login-btn"> Logout </a>
+        </li>
+        {% else %}
+        <li>
+          <a href="{% url 'library:login' %}" class="login-btn"> Login </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+        <button
+          type="button"
+          onclick="this.parentElement.style.display = 'none'"
+        >
+          &times;
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- MAIN CONTENT -->
+    <main>{% block content %}{% endblock %}</main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <h3>LibraryPro</h3>
+          <p>Premium Digital Library Management System</p>
+        </div>
+
+        <div>
+          <h3>Support</h3>
+          <a href="{% url 'library:contact' %}">Contact Us</a>
+          <a href="{% url 'library:about' %}">About Us</a>
+        </div>
+
+        <div>
+          <h3>Follow Us</h3>
+          <a href="#">Facebook</a>
+          <a href="#">Instagram</a>
+          <a href="#">LinkedIn</a>
+        </div>
+      </div>
+
+      <div class="copyright">© 2026 LibraryPro. All rights reserved.</div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us | LibraryPro{% endblock %}
+
+{% block content %}
+    <!-- HERO -->
+    <section class="contact-hero">
+        <h1>Contact LibraryPro</h1>
+        <p>We are always ready to help you.</p>
+    </section>
+
+    <!-- CONTACT INFO -->
+    <section class="contact-info-section">
+        <div class="contact-card">
+            <i class="fa-solid fa-location-dot"></i>
+            <h3>Office Address</h3>
+            <p>Dhaka, Bangladesh</p>
+        </div>
+
+        <div class="contact-card">
+            <i class="fa-solid fa-phone"></i>
+            <h3>Phone</h3>
+            <p>+880 1700-000000</p>
+        </div>
+
+        <div class="contact-card">
+            <i class="fa-solid fa-envelope"></i>
+            <h3>Email</h3>
+            <p>support@librarypro.com</p>
+        </div>
+
+        <div class="contact-card">
+            <i class="fa-solid fa-clock"></i>
+            <h3>Working Hours</h3>
+            <p>24/7 Online Support</p>
+        </div>
+    </section>
+
+    <!-- CONTACT FORM & MAP -->
+    <section class="contact-main">
+        <div class="contact-form-box">
+            <h2>Send Message</h2>
+
+            <form method="POST" action="{% url 'library:contact' %}">
+                {% csrf_token %}
+                
+                <div class="input-row">
+                    <input 
+                        type="text" 
+                        name="name" 
+                        placeholder="Your Name" 
+                        value="{{ form.name.value|default:'' }}"
+                        required
+                    />
+                    <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="Your Email" 
+                        value="{{ form.email.value|default:'' }}"
+                        required
+                    />
+                </div>
+
+                <input 
+                    type="text" 
+                    name="subject" 
+                    placeholder="Subject" 
+                    value="{{ form.subject.value|default:'' }}"
+                    required
+                />
+
+                <textarea 
+                    name="message" 
+                    placeholder="Your Message"
+                    required
+                >{{ form.message.value|default:'' }}</textarea>
+
+                <button type="submit" class="btn">Send Message</button>
+            </form>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="margin-top: 15px; padding: 12px; background: #10b981; color: white; border-radius: 4px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- MAP -->
+        <div class="map-box">
+            <iframe
+                src="https://maps.google.com/maps?q=Dhaka%20Bangladesh&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                loading="lazy"
+            ></iframe>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+
+        <div class="faq-grid">
+            <div class="faq-card">
+                <h3>How can I borrow a book?</h3>
+                <p>Choose a book, select borrow option, and complete checkout.</p>
+            </div>
+
+            <div class="faq-card">
+                <h3>What is the borrow duration?</h3>
+                <p>Default is 7 days. You can extend based on availability.</p>
+            </div>
+
+            <div class="faq-card">
+                <h3>Do you deliver outside Dhaka?</h3>
+                <p>Currently delivering in Dhaka. Countrywide delivery coming soon.</p>
+            </div>
+
+            <div class="faq-card">
+                <h3>How are late fees calculated?</h3>
+                <p>৳5 per day after due date. Check your profile for current fines.</p>
+            </div>
+
+            <div class="faq-card">
+                <h3>Can I purchase books?</h3>
+                <p>Yes! Some books are available for purchase. Check each book for options.</p>
+            </div>
+
+            <div class="faq-card">
+                <h3>How do I cancel an order?</h3>
+                <p>Contact support within 1 hour of placing the order for cancellation.</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+          <h3>How long is delivery time?</h3>
+
+          <p>Home delivery arrives within 48-72 hours.</p>
+        </div>
+
+        <div class="faq-card">
+          <h3>Can I buy books?</h3>
+
+          <p>Yes, you can purchase available books from cart.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <h3>LibraryPro</h3>
+
+          <p>Premium Digital Library System</p>
+        </div>
+
+        <div>
+          <h3>Follow Us</h3>
+
+          <a href="#"> Facebook </a>
+
+          <a href="#"> Instagram </a>
+
+          <a href="#"> LinkedIn </a>
+        </div>
+      </div>
+
+      <div class="copyright">© 2026 LibraryPro</div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Login |
+LibraryPro{% endblock %} {% block content %}
+<section class="auth-page">
+  <!-- LEFT SIDE -->
+  <div class="auth-left">
+    <div class="auth-overlay"></div>
+    <div class="auth-content">
+      <i class="fa-solid fa-book-open"></i>
+      <h1>Welcome Back To LibraryPro</h1>
+      <p>
+        Access thousands of books, manage your borrowing, and continue your
+        learning journey.
+      </p>
+      <div class="auth-feature">
+        <div>
+          <i class="fa-solid fa-book"></i>
+          <span>10,000+ Books</span>
+        </div>
+        <div>
+          <i class="fa-solid fa-users"></i>
+          <span>50,000+ Readers</span>
+        </div>
+        <div>
+          <i class="fa-solid fa-clock"></i>
+          <span>24/7 Digital Access</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="auth-right">
+    <form method="POST" action="{% url 'library:login' %}" class="login-box">
+      {% csrf_token %}
+      <h2>Login</h2>
+      <p>Enter your account details</p>
+
+      <!-- Username/Email Field -->
+      <div class="auth-input">
+        <i class="fa-solid fa-envelope"></i>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username or Email"
+          value="{{ form.username.value|default:'' }}"
+          required
+        />
+      </div>
+      {% if form.username.errors %}
+      <small style="color: red">{{ form.username.errors.0 }}</small>
+      {% endif %}
+
+      <!-- Password Field -->
+      <div class="auth-input">
+        <i class="fa-solid fa-lock"></i>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+      </div>
+      {% if form.password.errors %}
+      <small style="color: red">{{ form.password.errors.0 }}</small>
+      {% endif %}
+
+      <!-- Remember & Forgot -->
+      <div class="remember">
+        <label>
+          <input type="checkbox" name="remember_me" />
+          Remember Me
+        </label>
+        <a href="#">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="login-btn">Login</button>
+
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+      <!-- Social Login (Optional) -->
+      <div class="social-login">
+        <button type="button" onclick="alert('Coming soon!')">
+          <i class="fa-brands fa-google"></i>
+          Google
+        </button>
+        <button type="button" onclick="alert('Coming soon!')">
+          <i class="fa-brands fa-facebook"></i>
+          Facebook
+        </button>
+      </div>
+
+      <p class="register-text">
+        Don't have an account?
+        <a href="{% url 'library:register' %}">Create Account</a>
+      </p>
+    </form>
+  </div>
+</section>
+{% endblock %}

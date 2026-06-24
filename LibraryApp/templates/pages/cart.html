@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Cart | LibraryPro{% endblock %}
+
+{% block content %}
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+        <h1>My Cart</h1>
+        <p>Review your selected books before checkout.</p>
+    </section>
+
+    <!-- CART SECTION -->
+    <section class="cart-section">
+        <!-- LEFT: CART ITEMS -->
+        <div class="cart-items">
+            {% if cart_items %}
+                {% for cart_item in cart_items %}
+                    <div class="cart-item">
+                        {% if cart_item.book.cover_image %}
+                            <img src="{{ cart_item.book.cover_image.url }}" alt="{{ cart_item.book.title }}">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1200" alt="{{ cart_item.book.title }}">
+                        {% endif %}
+
+                        <div class="cart-info">
+                            <h3>{{ cart_item.book.title }}</h3>
+                            <p>Author: {{ cart_item.book.author }}</p>
+                            <p>Type: {% if cart_item.item_type == 'borrow' %}Borrow{% else %}Buy{% endif %}</p>
+                            
+                            {% if cart_item.item_type == 'borrow' %}
+                                <p>Duration: {{ cart_item.duration_days }} Days</p>
+                            {% else %}
+                                <p>Quantity: {{ cart_item.quantity }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="cart-price">
+                            ৳{{ cart_item.get_item_price }}
+                        </div>
+
+                        <form method="POST" action="{% url 'library:remove_from_cart' cart_item.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="remove-btn">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
+                    <i class="fa-solid fa-shopping-cart" style="font-size: 48px; color: #ccc;"></i>
+                    <h2 style="margin-top: 20px;">Your cart is empty</h2>
+                    <p>Add books to get started</p>
+                    <a href="{% url 'library:books_list' %}" class="btn">Continue Shopping</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT: ORDER SUMMARY -->
+        <div class="cart-summary">
+            <h2>Order Summary</h2>
+
+            <div class="summary-row">
+                <span>Books Total</span>
+                <strong>৳{{ items_total|default:"0" }}</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Delivery Charge</span>
+                <strong>৳{{ delivery_charge|default:"0" }}</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Service Fee</span>
+                <strong>৳{{ service_fee|default:"0" }}</strong>
+            </div>
+
+            <hr style="margin: 15px 0;">
+
+            <div class="summary-row" style="font-size: 18px;">
+                <span>Total Amount</span>
+                <strong>৳{{ total_amount|default:"0" }}</strong>
+            </div>
+
+            {% if cart_items %}
+                <a href="{% url 'library:checkout' %}" class="btn" style="width: 100%; margin-top: 20px; text-align: center; display: block;">
+                    Proceed to Checkout
+                </a>
+                <a href="{% url 'library:books_list' %}" style="text-align: center; display: block; margin-top: 10px; color: var(--primary);">
+                    Continue Shopping
+                </a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
+
+        <hr>
+
+        <div class="summary-row total-price">
+
+            <span>
+                Grand Total
+            </span>
+
+            <strong>
+                ৳530
+            </strong>
+
+        </div>
+
+        <button class="btn checkout-btn">
+
+            Proceed To Checkout
+
+        </button>
+
+    </div>
+
+</section>
+
+<!-- RECOMMENDED -->
+
+<section class="section">
+
+    <h2 class="section-title">
+
+        You May Also Like
+
+    </h2>
+
+    <div class="book-grid">
+
+        <div class="book-card">
+
+            <img
+            src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=1200">
+
+            <div class="book-content">
+
+                <h3>
+                    JavaScript Pro
+                </h3>
+
+                <a href="book-details.html"
+                class="btn">
+
+                    View Book
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="book-card">
+
+            <img
+            src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1200">
+
+            <div class="book-content">
+
+                <h3>
+                    AI Revolution
+                </h3>
+
+                <a href="book-details.html"
+                class="btn">
+
+                    View Book
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+
+<footer>
+
+    <div class="footer-grid">
+
+        <div>
+
+            <h3>
+                LibraryPro
+            </h3>
+
+            <p>
+                Premium Library Management Platform.
+            </p>
+
+        </div>
+
+        <div>
+
+            <h3>
+                Quick Links
+            </h3>
+
+            <a href="books.html">
+                Books
+            </a>
+
+            <a href="contact.html">
+                Contact
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="copyright">
+
+        © 2026 LibraryPro
+
+    </div>
+
+</footer>
+
+</body>
+</html>
